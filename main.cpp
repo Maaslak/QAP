@@ -14,7 +14,7 @@ int main(){
     {
         solution.greedyLocalSearch();
         num_iter++;
-    } while (double(clock() - begin) / CLOCKS_PER_SEC < 1 || num_iter < 10);
+    } while (double(clock() - begin) < 100 || num_iter < 10);
     
     cout << "Cool!\n";
 }

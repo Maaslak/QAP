@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include "Solution.h"
+#include <vector>
 
 void Solution::initRandomSolution(int len) {
 
@@ -15,7 +16,7 @@ void Solution::initRandomSolution(int len) {
 }
 
 void Solution::greedyLocalSearch() {
-	sleep(1);
+	vector<int> test = vector<int>(0, 5);
 }
 
 void Solution::steepestLocalSearch() {
