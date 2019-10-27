@@ -1,27 +1,26 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "type": "shell",
-            "label": "main build",
-            "command": "/usr/bin/g++",
-            "args": [
-                "${workspaceFolder}/main.cpp",
-                "${workspaceFolder}/Solution.cpp",
-                "-g",
-                "-o",
-                "${workspaceFolder}/build/main"
-            ],
-            "options": {
-                "cwd": "/usr/bin"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "main build",
+      "command": "/usr/bin/g++",
+      "args": [
+        "${workspaceFolder}/main.cpp",
+        "${workspaceFolder}/Solution.cpp",
+        "${workspaceFolder}/Problem.cpp",
+        "-g",
+        "-o",
+        "${workspaceFolder}/build/main"
+      ],
+      "options": {
+        "cwd": "/usr/bin"
+      },
+      "problemMatcher": ["$gcc"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
 }
