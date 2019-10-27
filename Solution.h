@@ -9,7 +9,8 @@
 
 using namespace std;
 
-class Solution {
+class Solution
+{
 public:
 	// Value of objective function
 	double objectiveValue;
@@ -17,10 +18,11 @@ public:
 	// Solution holder
 	vector<int> permutation;
 
-	Solution () {}
+	Solution() {}
 
 	// Creates a copy of the given solution
-	// Solution (Solution& solution) {
+	// Solution(Solution &solution)
+	// {
 	// 	objectiveValue = solution.objectiveValue;
 	// 	permutation = solution.permutation;
 	// }
@@ -34,4 +36,4 @@ public:
 	void greedyLocalSearch();
 };
 
-#endif		/* Solution_HEADER */
+#endif /* Solution_HEADER */
