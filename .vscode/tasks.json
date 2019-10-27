@@ -8,8 +8,9 @@
             "args": [
                 "${workspaceFolder}/main.cpp",
                 "${workspaceFolder}/Solution.cpp",
+                "-g",
                 "-o",
-                "${workspaceFolder}/build/main",
+                "${workspaceFolder}/build/main"
             ],
             "options": {
                 "cwd": "/usr/bin"
