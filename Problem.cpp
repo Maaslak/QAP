@@ -53,14 +53,4 @@ bool QAP::load(char *filename)
     return true;
 }
 
-QAP::~QAP()
-{
-    for (size_t i = 0; i < n; i++)
-    {
-        delete (A[i]);
-        delete (B[i]);
-    }
 
-    delete (A);
-    delete (B);
-}

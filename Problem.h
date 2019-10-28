@@ -30,7 +30,6 @@ public:
 
 	bool load(char *filename);
 
-	~QAP();
 };
 
 #endif /* Problem_HEADER */

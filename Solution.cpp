@@ -13,6 +13,17 @@ void Solution::initRandomSolution(int len) {
 	{
 		swap(permutation[i + rand() % (len - i - 1)], permutation[i]);
 	}
+	calculateObjectiveValue();
+}
+
+void Solution::calculateObjectiveValue(){
+	long sum=0;
+	for(size_t i=0; i<permutation.size(); i++){
+		for(int j=0; j<permutation.at(i); j++){
+			sum+=problem.A[i][j]*problem.B[i][j]+problem.A[j][i]*problem.B[j][i];
+		}
+	}
+	objectiveValue=sum;
 }
 
 void Solution::greedyLocalSearch() {
