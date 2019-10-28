@@ -19,8 +19,10 @@ void Solution::initRandomSolution(int len) {
 void Solution::calculateObjectiveValue(){
 	long sum=0;
 	for(size_t i=0; i<permutation.size(); i++){
-		for(int j=0; j<permutation.at(i); j++){
-			sum+=problem.A[i][j]*problem.B[i][j]+problem.A[j][i]*problem.B[j][i];
+		for(size_t j=0; j<permutation.size(); j++){
+			int a = permutation.at(i);
+			int b = permutation.at(j);
+			sum += problem.A[a][b]*problem.B[i][j]+problem.A[b][a]*problem.B[j][i];
 		}
 	}
 	objectiveValue=sum;
