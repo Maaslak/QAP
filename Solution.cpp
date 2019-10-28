@@ -22,7 +22,7 @@ void Solution::calculateObjectiveValue(){
 		for(size_t j=0; j<permutation.size(); j++){
 			int a = permutation.at(i);
 			int b = permutation.at(j);
-			sum += problem.A[a][b]*problem.B[i][j]+problem.A[b][a]*problem.B[j][i];
+			sum += problem.B[a][b]*problem.A[i][j];
 		}
 	}
 	objectiveValue=sum;
