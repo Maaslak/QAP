@@ -4,6 +4,8 @@
 
 using namespace std;
 
+long runRandomAlgorithm(QAP, int);
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -14,18 +16,20 @@ int main(int argc, char *argv[])
 
     QAP qap;
     qap.load(argv[1]);
+    long result = runRandomAlgorithm(qap, 100);
+    cout << "Result: "<<result<<endl;
+}
+
+long runRandomAlgorithm(QAP qap, int maxTime){
     Solution solution = Solution(qap);
-    solution.initRandomSolution(qap.n);
-    cout<<"Current objective value: "<<solution.objectiveValue<<endl;
-
-    int num_iter = 0;
+    long currentMin = __LONG_MAX__;
     clock_t begin = clock();
-
-    do
-    {
-        solution.greedyLocalSearch();
-        num_iter++;
-    } while (double(clock() - begin) < 100 || num_iter < 10);
-
-    cout << "Cool!\n";
+    do{
+        solution.initRandomSolution(qap.n);
+        long value = solution.objectiveValue;
+        if(value < currentMin){
+            currentMin = value;
+        }
+    }while (double(clock() - begin) < maxTime);
+    return currentMin;
 }

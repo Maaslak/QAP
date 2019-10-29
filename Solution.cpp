@@ -18,8 +18,8 @@ void Solution::initRandomSolution(int len) {
 
 void Solution::calculateObjectiveValue(){
 	long sum=0;
-	for(size_t i=0; i<permutation.size(); i++){
-		for(size_t j=0; j<permutation.size(); j++){
+	for(size_t i=0; i<problem.n; i++){
+		for(size_t j=0; j<problem.n; j++){
 			int a = permutation.at(i);
 			int b = permutation.at(j);
 			sum += problem.B[a][b]*problem.A[i][j];
