@@ -2,7 +2,10 @@
 #include "Solution.h"
 #include <vector>
 
-void Solution::initRandomSolution(int len) {
+using namespace std;
+
+void Solution::initRandomSolution() {
+	int len = problem.n;
 
 	for (size_t i = 0; i < len; i++)
 	{
@@ -34,4 +37,20 @@ void Solution::greedyLocalSearch() {
 
 void Solution::steepestLocalSearch() {
     sleep(1);
+}
+
+Solution Solution::getNextNeighbour(){
+	Solution neighbour = Solution(problem);
+	neighbour.permutation = permutation;
+	int swapA = get<0>(nextSwap);
+	int swapB = get<1>(nextSwap);
+	swap(neighbour.permutation[swapA], neighbour.permutation[swapB]);
+	neighbour.calculateObjectiveValue();
+	swapB++;
+	if(swapB == problem.n){
+		swapB = 0;
+		swapA++;
+	}
+	nextSwap = make_tuple(swapA, swapB);
+	return neighbour;
 }

@@ -6,6 +6,7 @@
 #include <fstream>
 #include <vector>
 #include <iostream>
+#include <tuple>
 #include "Problem.h"
 
 using namespace std;
@@ -13,7 +14,7 @@ using namespace std;
 class Solution
 {
 public:
-	//Problem associated with this solution
+	// Problem associated with this solution
 	QAP problem;
 
 	// Value of objective function
@@ -21,6 +22,9 @@ public:
 
 	// Solution holder
 	vector<int> permutation;
+
+	// Holder for next swap (to create a neighbour)
+	tuple<int, int> nextSwap = make_tuple(0,0);
 
 	Solution() {}
 
@@ -33,7 +37,9 @@ public:
 	// 	permutation = solution.permutation;
 	// }
 
-	void initRandomSolution(int);
+	Solution getNextNeighbour();
+
+	void initRandomSolution();
 
 	// Optimizes locally the objective function by steepest algorithm.
 	void steepestLocalSearch();
