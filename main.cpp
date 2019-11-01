@@ -37,3 +37,25 @@ long runRandomAlgorithm(QAP qap, int maxTime)
     } while (double(clock() - begin) < maxTime);
     return currentMin;
 }
+
+long runGreedyAlgorithm(QAP qap){
+    Solution solution = Solution(qap);
+    solution.initRandomSolution();
+    long currentMin = __LONG_MAX__;
+    bool improved = true;
+    while(improved){
+        int tries = 0;
+        while(tries < qap.n*qap.n){
+            Solution neighbour = solution.getNextNeighbour();
+            if(neighbour.objectiveValue < currentMin){
+                currentMin = neighbour.objectiveValue;
+                solution = neighbour;
+                cout<<"New min: "<<currentMin<<endl;
+                break;
+            }
+            tries++;  
+        }
+        improved = tries < qap.n*qap.n;
+    }
+    return currentMin;
+} 
