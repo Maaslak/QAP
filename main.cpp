@@ -6,6 +6,8 @@ using namespace std;
 
 long runRandomAlgorithm(QAP, int);
 long runGreedyAlgorithm(QAP);
+long runSteepestAlgorithm(QAP);
+long runLocalSearchAlgorithm(QAP, bool);
 
 int main(int argc, char *argv[])
 {
@@ -17,8 +19,9 @@ int main(int argc, char *argv[])
 
     QAP qap;
     qap.load(argv[1]);
-    long result = runGreedyAlgorithm(qap);
-    cout << "Result: " << result << endl;
+    cout << "Random: " << runRandomAlgorithm(qap, 10000) << endl;
+    cout << "Greedy: " << runGreedyAlgorithm(qap) << endl;
+    cout << "Steepest: " << runSteepestAlgorithm(qap) << endl;
 }
 
 long runRandomAlgorithm(QAP qap, int maxTime)
@@ -38,24 +41,32 @@ long runRandomAlgorithm(QAP qap, int maxTime)
     return currentMin;
 }
 
-long runGreedyAlgorithm(QAP qap){
+long runGreedyAlgorithm(QAP qap)
+{
+    return runLocalSearchAlgorithm(qap, true);
+}
+
+long runSteepestAlgorithm(QAP qap)
+{
+    return runLocalSearchAlgorithm(qap, false);
+}
+
+long runLocalSearchAlgorithm(QAP qap, bool isGreedy){
     Solution solution = Solution(qap);
     solution.initRandomSolution();
     long currentMin = __LONG_MAX__;
     bool improved = true;
     while(improved){
-        int tries = 0;
-        while(tries < qap.n*qap.n){
+        improved = false;
+        while(solution.hasNextNeighbour()){
             Solution neighbour = solution.getNextNeighbour();
             if(neighbour.objectiveValue < currentMin){
                 currentMin = neighbour.objectiveValue;
                 solution = neighbour;
-                cout<<"New min: "<<currentMin<<endl;
-                break;
+                improved = true;
+                if(isGreedy) break;
             }
-            tries++;  
         }
-        improved = tries < qap.n*qap.n;
     }
     return currentMin;
 } 

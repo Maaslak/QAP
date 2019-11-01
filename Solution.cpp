@@ -96,6 +96,11 @@ void Solution::steepestLocalSearch()
 	sleep(1);
 }
 
+bool Solution::hasNextNeighbour()
+{
+	return get<0>(nextSwap)<problem.n;
+}
+
 Solution Solution::getNextNeighbour()
 {
 	Solution neighbour = Solution(problem);

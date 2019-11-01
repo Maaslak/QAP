@@ -44,6 +44,8 @@ public:
 	// 	permutation = solution.permutation;
 	// }
 
+	bool hasNextNeighbour();
+
 	Solution getNextNeighbour();
 
 	void initRandomSolution();
