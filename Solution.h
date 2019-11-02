@@ -12,6 +12,12 @@
 
 using namespace std;
 
+enum LocalSearchAlgorithm
+{
+	_Greedy = 0,
+	_Steepest = 1
+};
+
 class Solution
 {
 private:
@@ -46,7 +52,7 @@ public:
 
 	bool hasNextNeighbour();
 
-	Solution getNextNeighbour();
+	void checkNextNeighbour();
 
 	void initRandomSolution();
 
@@ -56,7 +62,7 @@ public:
 	void naiveRandomSearch();
 
 	// Optimizes objective value by random algorithm with checking every swap in gen random solution
-	void lessNaiveRandomSearch();
+	void lessNaiveRandomSearch(int);
 
 	// Optimizes locally the objective function by steepest algorithm.
 	void steepestLocalSearch();
@@ -66,6 +72,8 @@ public:
 
 private:
 	void calculateObjectiveValue();
+
+	void localSearch(LocalSearchAlgorithm);
 };
 
 #endif /* Solution_HEADER */

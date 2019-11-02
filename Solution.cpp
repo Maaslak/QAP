@@ -6,6 +6,7 @@
 void Solution::initRandomSolution()
 {
 	permutation = vector<int>(problem.n);
+	bestObjectiveValue = numeric_limits<int>::max();
 	iota(permutation.begin(), permutation.end(), 0);
 
 	for (size_t i = 0; i < problem.n - 1; i++)
@@ -74,26 +75,45 @@ void Solution::naiveRandomSearch()
 	calculateObjectiveValue();
 }
 
-void Solution::lessNaiveRandomSearch()
+void Solution::lessNaiveRandomSearch(int maxTime)
 {
-	for (size_t i = 0; i < permutation.size() - 1; i++)
-	{
+	clock_t begin = clock();
+	do{
+		for (size_t i = 0; i < permutation.size() - 1; i++)
+		{
 
-		long second = i + rand() % (permutation.size() - i - 1);
-		updateObjectValue(i, second);
-		swap(permutation[i], permutation[second]);
-		updateBestSolution();
-	}
+			long second = i + rand() % (permutation.size() - i - 1);
+			updateObjectValue(i, second);
+			swap(permutation[i], permutation[second]);
+			updateBestSolution();
+		}
+	}while (double(clock() - begin) < maxTime);
 }
 
 void Solution::greedyLocalSearch()
 {
-	vector<int> test = vector<int>(0, 5);
+	localSearch(_Greedy);
 }
 
 void Solution::steepestLocalSearch()
 {
-	sleep(1);
+	localSearch(_Steepest);
+}
+
+void Solution::localSearch(LocalSearchAlgorithm algorithm){
+    bool improved = true;
+    while(improved){
+        improved = false;
+        while(hasNextNeighbour()){
+            checkNextNeighbour();
+            if(objectiveValue < bestObjectiveValue){
+                updateBestSolution();
+                improved = true;
+                if(algorithm = _Greedy) break;
+            }
+        }
+		nextSwap = make_tuple(0, 0);
+    }
 }
 
 bool Solution::hasNextNeighbour()
@@ -101,14 +121,12 @@ bool Solution::hasNextNeighbour()
 	return get<0>(nextSwap)<problem.n;
 }
 
-Solution Solution::getNextNeighbour()
+void Solution::checkNextNeighbour()
 {
-	Solution neighbour = Solution(problem);
-	neighbour.permutation = permutation;
 	int swapA = get<0>(nextSwap);
 	int swapB = get<1>(nextSwap);
-	swap(neighbour.permutation[swapA], neighbour.permutation[swapB]);
-	neighbour.calculateObjectiveValue();
+	swap(permutation[swapA], permutation[swapB]);
+	updateObjectValue(swapA, swapB);
 	swapB++;
 	if (swapB == problem.n)
 	{
@@ -116,5 +134,4 @@ Solution Solution::getNextNeighbour()
 		swapA++;
 	}
 	nextSwap = make_tuple(swapA, swapB);
-	return neighbour;
 }
