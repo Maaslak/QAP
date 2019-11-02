@@ -37,7 +37,7 @@ public:
 	vector<int> bestPermutation;
 
 	// Holder for next swap (to create a neighbour)
-	tuple<int, int> nextSwap = make_tuple(0, 0);
+	tuple<int, int> nextSwap = make_tuple(1, 0);
 
 	Solution() {}
 

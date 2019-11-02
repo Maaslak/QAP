@@ -112,7 +112,7 @@ void Solution::localSearch(LocalSearchAlgorithm algorithm){
                 if(algorithm = _Greedy) break;
             }
         }
-		nextSwap = make_tuple(0, 0);
+		nextSwap = make_tuple(1, 0);
     }
 }
 
@@ -128,7 +128,7 @@ void Solution::checkNextNeighbour()
 	swap(permutation[swapA], permutation[swapB]);
 	updateObjectValue(swapA, swapB);
 	swapB++;
-	if (swapB == problem.n)
+	if (swapB == swapA)
 	{
 		swapB = 0;
 		swapA++;
