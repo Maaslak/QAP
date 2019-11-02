@@ -146,7 +146,7 @@ void Solution::heuristic(){
 			long currentMin = numeric_limits<long>::max();
 			for(int j = 0; j < problem.n; j++){ //objects
 				if(isPlaced[j])continue;
-				long value = problem.B[k][j] * problem.A[k][j] + problem.B[j][k] * problem.A[j][k];
+				long value = problem.B[k][j] * problem.A[0][i] + problem.B[j][k] * problem.A[i][0];
 				if(value < currentMin){
 					currentMin = value;
 					currentBest = j;
