@@ -135,3 +135,27 @@ void Solution::checkNextNeighbour()
 	}
 	nextSwap = make_tuple(swapA, swapB);
 }
+
+void Solution::heuristic(){
+	for(int k = 0; k < problem.n; k++){
+		vector<bool> isPlaced = vector<bool>(problem.n);
+		permutation[0] = k;
+		isPlaced[k] = true;
+		for(int i = 1; i<problem.n; i++){ //places
+			int currentBest = -1;
+			long currentMin = numeric_limits<long>::max();
+			for(int j = 0; j < problem.n; j++){ //objects
+				if(isPlaced[j])continue;
+				long value = problem.B[k][j] * problem.A[k][j] + problem.B[j][k] * problem.A[j][k];
+				if(value < currentMin){
+					currentMin = value;
+					currentBest = j;
+				}
+			}
+			permutation[i]=currentBest;
+			isPlaced[currentBest]=true;
+		}
+		calculateObjectiveValue();
+		updateBestSolution();
+	}
+}

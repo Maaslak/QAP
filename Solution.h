@@ -70,6 +70,9 @@ public:
 	// Optimizes locally the objective function by greedy algorithm.
 	void greedyLocalSearch();
 
+	// Optimizes objective value by using simple heuristic
+	void heuristic();
+
 private:
 	void calculateObjectiveValue();
 

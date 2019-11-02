@@ -21,6 +21,10 @@ int main(int argc, char *argv[])
     cout << "Random: " << solution.bestObjectiveValue << endl;
 
     solution.initRandomSolution();
+    solution.heuristic();
+    cout << "Heuristic: " << solution.bestObjectiveValue << endl;
+
+    solution.initRandomSolution();
     solution.greedyLocalSearch();
     cout << "Greedy: " << solution.bestObjectiveValue << endl;
 
