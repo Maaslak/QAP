@@ -41,7 +41,8 @@ int main(int argc, char *argv[])
         "heuristic",
         "greedyLocalSearch",
         "steepestLocalSearch",
-        "lessNaiveRandomSearch"};
+        "lessNaiveRandomSearch",
+        "naiveRandomSearch"};
     vector<string>::iterator selectedAlgoritm = algorithmNames.end();
 
     if (argc == 3)
@@ -68,23 +69,35 @@ int main(int argc, char *argv[])
         bind(&Solution::heuristic, ref(solution)),
         bind(&Solution::greedyLocalSearch, ref(solution)),
         bind(&Solution::steepestLocalSearch, ref(solution)),
-        [&solution]() { return solution.lessNaiveRandomSearch(10000); }};
+        [&solution]() { return solution.lessNaiveRandomSearch(10000); },
+        [&solution]() { return solution.naiveRandomSearch(10000); },
+    };
 
     if (selectedAlgoritm != algorithmNames.end())
     {
         solution.initRandomSolution();
         algorithms[selectedAlgoritm - algorithmNames.begin()]();
         solution.save(resultFilename(argv[1], *selectedAlgoritm, execId));
-        cout << *selectedAlgoritm << ": " << solution.bestObjectiveValue << endl;
+        // cout << *selectedAlgoritm << ": " << solution.bestObjectiveValue << endl;
     }
     else
     {
         for (size_t i = 0; i < algorithms.size(); i++)
         {
-            solution.initRandomSolution();
-            algorithms[i]();
+            int numIter = 0;
+            clock_t begin = clock();
+            solution.setObjectiveFuncCallsNum(0);
+            do
+            {
+                solution.initRandomSolution();
+                algorithms[i]();
+                numIter++;
+                // cout << algorithmNames[i] << ": " << solution.bestObjectiveValue << endl;
+            } while (numIter < 10 || double(clock() - begin) < 100);
+            // Setting mean of elapsed time
+            solution.setTime(double(clock() - begin) / CLOCKS_PER_SEC / numIter);
+            solution.setObjectiveFuncCallsNum(solution.getObjectiveFuncCallsNum() / numIter);
             solution.save(resultFilename(argv[1], algorithmNames[i], execId));
-            cout << algorithmNames[i] << ": " << solution.bestObjectiveValue << endl;
         }
     }
 }

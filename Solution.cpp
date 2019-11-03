@@ -52,6 +52,7 @@ void Solution::updateObjectValue(int firstIdx, int secondIdx)
 				oneStepUpdate(secondIdx, i, firstIdx, secondIdx);
 			}
 		}
+		objectiveFuncCallsNum++;
 	}
 }
 
@@ -68,12 +69,24 @@ void Solution::calculateObjectiveValue()
 		}
 	}
 	objectiveValue = sum;
+	objectiveFuncCallsNum++;
 }
 
-void Solution::naiveRandomSearch()
+void Solution::naiveRandomSearch(int maxTime)
 {
+	clock_t begin = clock();
 	initRandomSolution();
 	calculateObjectiveValue();
+	do
+	{
+		for (size_t i = 0; i < permutation.size() - 1; i++)
+		{
+			long second = i + rand() % (permutation.size() - i - 1);
+			swap(permutation[i], permutation[second]);
+		}
+		calculateObjectiveValue();
+		updateBestSolution();
+	} while (double(clock() - begin) < maxTime);
 }
 
 void Solution::lessNaiveRandomSearch(int maxTime)
@@ -173,11 +186,26 @@ void Solution::heuristic()
 	}
 }
 
+void Solution::setTime(double seconds)
+{
+	timeElapsed = seconds;
+}
+
+void Solution::setObjectiveFuncCallsNum(long calls_num)
+{
+	objectiveFuncCallsNum = calls_num;
+}
+
+long Solution::getObjectiveFuncCallsNum()
+{
+	return objectiveFuncCallsNum;
+}
+
 void Solution::save(string filename)
 {
 	ofstream file;
 	file.open(filename);
-	file << problem.n << " " << bestObjectiveValue << '\n';
+	file << problem.n << " " << bestObjectiveValue << " " << timeElapsed << " " << objectiveFuncCallsNum << '\n';
 	for (size_t i = 0; i < bestPermutation.size(); i++)
 	{
 		file << bestPermutation[i] << " ";

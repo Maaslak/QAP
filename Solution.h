@@ -25,6 +25,11 @@ private:
 	void oneStepUpdate(int, int, int, int);
 	void updateObjectValue(int, int);
 
+	// time elapsed (needs to be set outside) with setTime
+	double timeElapsed;
+
+	long objectiveFuncCallsNum = 0;
+
 public:
 	// Problem associated with this solution
 	QAP problem;
@@ -60,7 +65,7 @@ public:
 	void updateBestSolution();
 
 	// Optimizes objective value by random algorithm with generating permutation every step
-	void naiveRandomSearch();
+	void naiveRandomSearch(int);
 
 	// Optimizes objective value by random algorithm with checking every swap in gen random solution
 	void lessNaiveRandomSearch(int);
@@ -73,6 +78,12 @@ public:
 
 	// Optimizes objective value by using simple heuristic
 	void heuristic();
+
+	void setTime(double);
+
+	void setObjectiveFuncCallsNum(long);
+
+	long getObjectiveFuncCallsNum();
 
 	void save(string);
 
