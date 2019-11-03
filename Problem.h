@@ -29,7 +29,6 @@ public:
 	int n, **A, **B;
 
 	bool load(char *filename);
-
 };
 
 #endif /* Problem_HEADER */

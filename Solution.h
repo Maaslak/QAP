@@ -8,6 +8,7 @@
 #include <iostream>
 #include <tuple>
 #include <limits>
+#include <list>
 #include "Problem.h"
 
 using namespace std;
@@ -72,6 +73,8 @@ public:
 
 	// Optimizes objective value by using simple heuristic
 	void heuristic();
+
+	void save(string);
 
 private:
 	void calculateObjectiveValue();

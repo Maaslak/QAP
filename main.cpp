@@ -3,8 +3,37 @@
 #include <ctime>
 #include <functional>
 #include <algorithm>
+#include <sys/stat.h>
+#include <sstream>
+#include <string>
 
 using namespace std;
+
+int genExecId()
+{
+    string execIdFilename = "exec_id";
+    ifstream file;
+    int execId = 0;
+    file.open(execIdFilename);
+    if (file.good())
+    {
+        file >> execId;
+        execId++;
+    }
+    file.close();
+    ofstream outFile;
+    outFile.open(execIdFilename);
+    outFile << execId;
+    outFile.close();
+    return execId;
+}
+
+string resultFilename(char *instanceName, string algName, int execId)
+{
+    ostringstream result;
+    result << "results/" << instanceName << "_" << algName << "_" << std::to_string(execId);
+    return result.str();
+}
 
 int main(int argc, char *argv[])
 {
@@ -29,6 +58,8 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    int execId = genExecId();
+
     QAP qap;
     qap.load(argv[1]);
     Solution solution = Solution(qap);
@@ -43,6 +74,7 @@ int main(int argc, char *argv[])
     {
         solution.initRandomSolution();
         algorithms[selectedAlgoritm - algorithmNames.begin()]();
+        solution.save(resultFilename(argv[1], *selectedAlgoritm, execId));
         cout << *selectedAlgoritm << ": " << solution.bestObjectiveValue << endl;
     }
     else
@@ -51,6 +83,7 @@ int main(int argc, char *argv[])
         {
             solution.initRandomSolution();
             algorithms[i]();
+            solution.save(resultFilename(argv[1], algorithmNames[i], execId));
             cout << algorithmNames[i] << ": " << solution.bestObjectiveValue << endl;
         }
     }

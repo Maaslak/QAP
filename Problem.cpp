@@ -4,9 +4,12 @@
 
 using namespace std;
 
-bool QAP::load(char *filename)
+bool QAP::load(char *instanceName)
 {
     ifstream inFile;
+
+    string filename = "data/";
+    filename += instanceName + (string) ".dat";
 
     inFile.open(filename);
 
@@ -52,5 +55,3 @@ bool QAP::load(char *filename)
     }
     return true;
 }
-
-

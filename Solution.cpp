@@ -2,6 +2,7 @@
 #include "Solution.h"
 #include <vector>
 #include <numeric>
+#include <iostream>
 
 void Solution::initRandomSolution()
 {
@@ -78,7 +79,8 @@ void Solution::naiveRandomSearch()
 void Solution::lessNaiveRandomSearch(int maxTime)
 {
 	clock_t begin = clock();
-	do{
+	do
+	{
 		for (size_t i = 0; i < permutation.size() - 1; i++)
 		{
 
@@ -87,7 +89,7 @@ void Solution::lessNaiveRandomSearch(int maxTime)
 			swap(permutation[i], permutation[second]);
 			updateBestSolution();
 		}
-	}while (double(clock() - begin) < maxTime);
+	} while (double(clock() - begin) < maxTime);
 }
 
 void Solution::greedyLocalSearch()
@@ -100,25 +102,30 @@ void Solution::steepestLocalSearch()
 	localSearch(_Steepest);
 }
 
-void Solution::localSearch(LocalSearchAlgorithm algorithm){
-    bool improved = true;
-    while(improved){
-        improved = false;
-        while(hasNextNeighbour()){
-            checkNextNeighbour();
-            if(objectiveValue < bestObjectiveValue){
-                updateBestSolution();
-                improved = true;
-                if(algorithm = _Greedy) break;
-            }
-        }
+void Solution::localSearch(LocalSearchAlgorithm algorithm)
+{
+	bool improved = true;
+	while (improved)
+	{
+		improved = false;
+		while (hasNextNeighbour())
+		{
+			checkNextNeighbour();
+			if (objectiveValue < bestObjectiveValue)
+			{
+				updateBestSolution();
+				improved = true;
+				if (algorithm = _Greedy)
+					break;
+			}
+		}
 		nextSwap = make_tuple(1, 0);
-    }
+	}
 }
 
 bool Solution::hasNextNeighbour()
 {
-	return get<0>(nextSwap)<problem.n;
+	return get<0>(nextSwap) < problem.n;
 }
 
 void Solution::checkNextNeighbour()
@@ -136,26 +143,46 @@ void Solution::checkNextNeighbour()
 	nextSwap = make_tuple(swapA, swapB);
 }
 
-void Solution::heuristic(){
-	for(int k = 0; k < problem.n; k++){
+void Solution::heuristic()
+{
+	for (int k = 0; k < problem.n; k++)
+	{
 		vector<bool> isPlaced = vector<bool>(problem.n);
 		permutation[0] = k;
 		isPlaced[k] = true;
-		for(int i = 1; i<problem.n; i++){ //places
+		for (int i = 1; i < problem.n; i++)
+		{ //places
 			int currentBest = -1;
 			long currentMin = numeric_limits<long>::max();
-			for(int j = 0; j < problem.n; j++){ //objects
-				if(isPlaced[j])continue;
+			for (int j = 0; j < problem.n; j++)
+			{ //objects
+				if (isPlaced[j])
+					continue;
 				long value = problem.B[k][j] * problem.A[0][i] + problem.B[j][k] * problem.A[i][0];
-				if(value < currentMin){
+				if (value < currentMin)
+				{
 					currentMin = value;
 					currentBest = j;
 				}
 			}
-			permutation[i]=currentBest;
-			isPlaced[currentBest]=true;
+			permutation[i] = currentBest;
+			isPlaced[currentBest] = true;
 		}
 		calculateObjectiveValue();
 		updateBestSolution();
 	}
+}
+
+void Solution::save(string filename)
+{
+	ofstream file;
+	file.open(filename);
+	file << problem.n << " " << bestObjectiveValue << '\n';
+	for (size_t i = 0; i < bestPermutation.size(); i++)
+	{
+		file << bestPermutation[i] << " ";
+	}
+	file << '\n';
+
+	file.close();
 }

@@ -9,7 +9,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/main",
-      "args": ["data/bur26a.dat"],
+      "args": ["bur26a"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
