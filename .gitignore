@@ -4,3 +4,6 @@ data
 results/*
 !results/.gitkeep
 exec_id
+venv
+\.ipynb_checkpoints/
+*\.ipynb

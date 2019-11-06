@@ -34,5 +34,6 @@
     "typeinfo": "cpp",
     "utility": "cpp",
     "functional": "cpp"
-  }
+  },
+  "python.pythonPath": "venv/bin/python"
 }
