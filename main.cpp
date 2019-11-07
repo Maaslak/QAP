@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     Solution solution = Solution(qap);
 
     vector<function<void()>> algorithms{
-        bind(&Solution::heuristic, ref(solution)),
+        [&solution]() { return solution.heuristic(10000); },
         bind(&Solution::greedyLocalSearch, ref(solution)),
         bind(&Solution::steepestLocalSearch, ref(solution)),
         [&solution]() { return solution.lessNaiveRandomSearch(10000); },

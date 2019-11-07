@@ -77,7 +77,7 @@ public:
 	void greedyLocalSearch();
 
 	// Optimizes objective value by using simple heuristic
-	void heuristic();
+	void heuristic(int);
 
 	void setTime(double);
 
@@ -91,6 +91,8 @@ private:
 	void calculateObjectiveValue();
 
 	void localSearch(LocalSearchAlgorithm);
+
+	void performHeuristic();
 };
 
 #endif /* Solution_HEADER */

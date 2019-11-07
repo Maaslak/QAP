@@ -156,15 +156,25 @@ void Solution::checkNextNeighbour()
 	nextSwap = make_tuple(swapA, swapB);
 }
 
-void Solution::heuristic()
+void Solution::heuristic(int maxTime)
 {
+	clock_t begin = clock();
+	do
+	{
+		performHeuristic();
+	} while (double(clock() - begin) < maxTime);
+}
+
+void Solution::performHeuristic(){
+	int startingPlace = rand() % problem.n;
 	for (int k = 0; k < problem.n; k++)
 	{
 		vector<bool> isPlaced = vector<bool>(problem.n);
-		permutation[0] = k;
+		permutation[startingPlace] = k;
 		isPlaced[k] = true;
-		for (int i = 1; i < problem.n; i++)
+		for (int i = 0; i < problem.n; i++)
 		{ //places
+			if(i == startingPlace) continue;
 			int currentBest = -1;
 			long currentMin = numeric_limits<long>::max();
 			for (int j = 0; j < problem.n; j++)
