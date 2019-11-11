@@ -36,19 +36,19 @@ string resultFilename(char *instanceName, string algName, int execId)
 }
 
 long runAlg(Solution& solution, function<void()>* alg, long& maxTime){
-    int numIter = 0;
+    int numIter = 0;   
     clock_t begin = clock();
-    solution.setObjectiveFuncCallsNum(0);
+    solution.setObjectiveFuncCallsNum(0); 
     do
     {
         solution.initRandomSolution();
         (*alg)();
         numIter++;
+        solution.updateMetrics();
         // cout << algorithmNames[i] << ": " << solution.bestObjectiveValue << endl;
     } while (numIter < 10 || double(clock() - begin) < 100);
-    // Setting mean of elapsed time
-    solution.updateMetrics();
-    solution.setTime(double(clock() - begin) / CLOCKS_PER_SEC / numIter);
+    // Setting mean of elapsed time    
+    solution.setTime(double(clock() - begin) / CLOCKS_PER_SEC);
     if (maxTime < solution.getTime()){
         maxTime = solution.getTime();
     }
@@ -58,9 +58,9 @@ long runAlg(Solution& solution, function<void()>* alg, long& maxTime){
 int main(int argc, char *argv[])
 {
     vector<string> algorithmNames{
-        "heuristic",
         "greedyLocalSearch",
         "steepestLocalSearch",
+        "heuristic",
         "lessNaiveRandomSearch",
         "naiveRandomSearch"};
     vector<string>::iterator selectedAlgoritm = algorithmNames.end();
