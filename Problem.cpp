@@ -15,7 +15,7 @@ bool QAP::load(char *instanceName)
 
     if (!inFile)
     {
-        cout << "File does not exists" << filename;
+        cout << "File does not exist " << filename;
         return false;
     }
 
@@ -53,5 +53,6 @@ bool QAP::load(char *instanceName)
             }
         }
     }
+    inFile.close();
     return true;
 }
