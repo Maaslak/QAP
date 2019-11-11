@@ -30,24 +30,46 @@ private:
 
 	long objectiveFuncCallsNum = 0;
 
+	class MetricsCollector{
+		int it = 0;
+		bool* inst;
+
+	public:
+		int numMeas;
+		long* startObjectiveValues,* objectiveValues,* numObjValCalls;
+
+		MetricsCollector() {};
+		MetricsCollector(int);
+		~MetricsCollector();
+
+		void addStartObjectiveValue(long);
+		void updateMetrics(long, long);
+	};
+
+	MetricsCollector* metricsCollector;
+
+	void addMetricToFile(long* tab, ofstream& file);
+
 public:
 	// Problem associated with this solution
-	QAP problem;
+	QAP* problem;
 
 	// Value of objective function
 	long objectiveValue;
 	long bestObjectiveValue = numeric_limits<int>::max();
 
 	// Solution holder
-	vector<int> permutation;
-	vector<int> bestPermutation;
+	int* permutation;
+	int* bestPermutation;
 
 	// Holder for next swap (to create a neighbour)
 	tuple<int, int> nextSwap = make_tuple(1, 0);
 
-	Solution() {}
+	Solution(QAP* qap);
 
-	Solution(QAP qap) : problem(qap){};
+	Solution() : Solution(NULL) {};
+
+	~Solution();
 
 	// Creates a copy of the given solution
 	// Solution(Solution &solution)
@@ -81,11 +103,15 @@ public:
 
 	void setTime(double);
 
+	double getTime();
+
 	void setObjectiveFuncCallsNum(long);
 
 	long getObjectiveFuncCallsNum();
 
-	void save(string);
+	void updateMetrics();
+
+	void save(string, int);
 
 private:
 	void calculateObjectiveValue();
