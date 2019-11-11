@@ -9,7 +9,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/main",
-      "args": ["bur26a"],
+      "args": ["--instance_name=chr12a"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],

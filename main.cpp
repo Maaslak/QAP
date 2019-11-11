@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <sstream>
 #include <string>
+#include "boost/program_options.hpp"
 
 using namespace std;
 
@@ -28,14 +29,14 @@ int genExecId()
     return execId;
 }
 
-string resultFilename(char *instanceName, string algName, int execId)
+string resultFilename(string instanceName, string algName, int execId, int numIter)
 {
     ostringstream result;
-    result << "results/" << instanceName << "_" << algName << "_" << std::to_string(execId);
+    result << "results/" << instanceName << "_" << algName << "_" << std::to_string(execId) << "_" << std::to_string(numIter);
     return result.str();
 }
 
-long runAlg(Solution& solution, function<void()>* alg, long& maxTime){
+long runAlg(Solution& solution, function<void()>* alg, int maxNumIter,  double& maxTime){
     int numIter = 0;   
     clock_t begin = clock();
     solution.setObjectiveFuncCallsNum(0); 
@@ -46,67 +47,99 @@ long runAlg(Solution& solution, function<void()>* alg, long& maxTime){
         numIter++;
         solution.updateMetrics();
         // cout << algorithmNames[i] << ": " << solution.bestObjectiveValue << endl;
-    } while (numIter < 10 || double(clock() - begin) < 100);
+    } while (numIter < maxNumIter || double(clock() - begin) < 100);
     // Setting mean of elapsed time    
-    solution.setTime(double(clock() - begin) / CLOCKS_PER_SEC);
+    solution.setTime(double(clock() - begin));
     if (maxTime < solution.getTime()){
         maxTime = solution.getTime();
     }
     return numIter;
 }
 
+bool process_command_line(int argc, char** argv, string& instanceName, string& selectedAlgorithm, int& maxNumIter){
+    try
+    {
+        namespace po = boost::program_options;
+        po::options_description desc("Options");
+
+        desc.add_options()
+            ("help", "produce help message")
+            ("instance_name", po::value<string>(&instanceName)->required(), "instance name available in data path")
+            ("selected_algorithm", po::value<string>(&selectedAlgorithm), "specify to select algorithm")
+            ("num_iter", po::value<int>(&maxNumIter)->default_value(10), "number of iterations")
+        ;
+        po::variables_map vm;
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+    
+        if (vm.count("help")) {
+            cout << desc << '\n';
+            return false;
+        }
+        po::notify(vm);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        return false;
+    }
+    catch(...){
+        std::cerr << "Unknown error!\n";
+        return false;
+    }
+
+    return true;    
+}
+
 int main(int argc, char *argv[])
 {
+    srand (time(NULL));
+    string instanceName, selectedAlgoritm;
+    int maxNumIter;
+
+    if (!process_command_line(argc, argv, instanceName, selectedAlgoritm, maxNumIter))
+        return -1;
+
     vector<string> algorithmNames{
         "greedyLocalSearch",
         "steepestLocalSearch",
         "heuristic",
         "lessNaiveRandomSearch",
-        "naiveRandomSearch"};
-    vector<string>::iterator selectedAlgoritm = algorithmNames.end();
+        "naiveRandomSearch"
+        };
 
-    if (argc == 3)
+    if (selectedAlgoritm.length())
     {
-        if ((selectedAlgoritm = find(algorithmNames.begin(), algorithmNames.end(), argv[2])) == algorithmNames.end())
+        if (find(algorithmNames.begin(), algorithmNames.end(), selectedAlgoritm) == algorithmNames.end())
         {
             cout << "Selected algorithm not in the list of available algorithms";
             return -1;
         }
     }
-    else if (argc != 2)
-    {
-        cout << "You need to pass instance location/name as a prameter";
-        return -1;
-    }
 
     int execId = genExecId();
 
     QAP qap;
-    if (!qap.load(argv[1]))
+    if (!qap.load(instanceName))
         exit(1);
-    Solution solution = Solution(&qap);
+    Solution solution = Solution(&qap, maxNumIter);
 
     function<void()> finiteAlgorithms[] = {
         bind(&Solution::greedyLocalSearch, ref(solution)),
         bind(&Solution::steepestLocalSearch, ref(solution)),
     };
 
-    if (selectedAlgoritm != algorithmNames.end())
+    if (selectedAlgoritm.length())
     {
-        // solution.initRandomSolution();
-        // algorithms[selectedAlgoritm - algorithmNames.begin()]();
-        // solution.save(resultFilename(argv[1], *selectedAlgoritm, execId), );
-        // cout << *selectedAlgoritm << ": " << solution.bestObjectiveValue << endl;
         cout << "TODO\n";
     }
     else
     {
-        long maxTime = 0;
+        double maxTime = 0;
         size_t i = 0;
         for (function<void()> alg: finiteAlgorithms)
         {
-            long numIter = runAlg(solution, &alg, maxTime);
-            solution.save(resultFilename(argv[1], algorithmNames[i], execId), numIter);
+            long numIter = runAlg(solution, &alg, maxNumIter, maxTime);
+            solution.save(resultFilename(instanceName, algorithmNames[i], execId, maxNumIter), numIter);
             i++;
         }
 
@@ -117,8 +150,8 @@ int main(int argc, char *argv[])
         };
         
         for(function<void()> alg: infiniteAlgorithms){
-            long numIter = runAlg(solution, &alg, maxTime);
-            solution.save(resultFilename(argv[1], algorithmNames[i], execId), numIter);
+            long numIter = runAlg(solution, &alg, maxNumIter, maxTime);
+            solution.save(resultFilename(instanceName, algorithmNames[i], execId, maxNumIter), numIter);
             i++;
         }
     }
