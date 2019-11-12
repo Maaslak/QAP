@@ -104,7 +104,7 @@ instance_n_map = {}
 
 for inst_name in INSTANCE_NAMES:
     for alg_name in ALG_NAMES:
-        parse_n_alg_inst(data, instance_n_map, 10, inst_name, alg_name)
+        parse_n_alg_inst(data, instance_n_map, 1, inst_name, alg_name)
 
 
 # +
@@ -172,3 +172,9 @@ calc_quality(data, opts)
 
 print(instance_n_map[INSTANCE_NAMES[0]])
 data[INSTANCE_NAMES[0]]["quality"]
+
+# ### Gen plots
+
+import matplotlib.pyplot as plt
+
+

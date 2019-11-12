@@ -45,7 +45,7 @@ for i in range(NUM_TIMES):
 print("Cool")
 # -
 
-# ### 300 num iters
+# ### 400 num iters
 
 # +
 import subprocess
