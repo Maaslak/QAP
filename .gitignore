@@ -3,6 +3,8 @@ build/*
 data
 results/*
 !results/.gitkeep
+figures/*
+!figures/.gitkeep
 exec_id
 venv
 \.ipynb_checkpoints/

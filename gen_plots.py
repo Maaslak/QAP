@@ -104,7 +104,7 @@ instance_n_map = {}
 
 for inst_name in INSTANCE_NAMES:
     for alg_name in ALG_NAMES:
-        parse_n_alg_inst(data, instance_n_map, 1, inst_name, alg_name)
+        parse_n_alg_inst(data, instance_n_map, 10, inst_name, alg_name)
 
 
 # +
@@ -129,9 +129,9 @@ def read_sln(opts, inst_name):
         })
 for inst_name in INSTANCE_NAMES:
     read_sln(opts, inst_name)
+
+
 # -
-
-
 
 # ## Calc required metics
 
@@ -145,6 +145,8 @@ def apply_metric_func(data: dict, metric_name, func, func_name):
 
 
 # ### Quality
+#
+# obj_val / opt_obj_val
 
 # +
 import numpy as np
@@ -165,16 +167,45 @@ def calc_quality(data, opts):
             inst_data.setdefault(
                 "quality", {}
             )[alg_name] = (
-                inst_data["min_end_obj_val"][alg_name] / 
+                np.array(inst_data["end_obj_val"][alg_name]) / 
                 opts[inst_name]["opt_val"]
             )
 calc_quality(data, opts)
 
-print(instance_n_map[INSTANCE_NAMES[0]])
-data[INSTANCE_NAMES[0]]["quality"]
-
 # ### Gen plots
 
+# +
 import matplotlib.pyplot as plt
 
+FIGURES_DIR = "figures/"
 
+TICKS_ALG_NAMES_MAP = {
+    "greedyLocalSearch": "GLS",
+    "heuristic": "H",
+    "lessNaiveRandomSearch": "LNRS",
+    "naiveRandomSearch": "NRS",
+    "steepestLocalSearch": "SLS",
+}
+
+TICKS_ALG_NAMES = [TICKS_ALG_NAMES_MAP[alg_name] for alg_name in ALG_NAMES]
+# -
+
+len(INSTANCE_NAMES)
+
+# +
+metric_name = "quality"
+plt.figure(figsize=(10,10))
+
+for i, inst_name in enumerate(INSTANCE_NAMES):
+    box_plot_data = []
+    for alg_name in ALG_NAMES:
+        box_plot_data.append(
+            np.array(data[inst_name][metric_name][alg_name]).reshape(-1)
+        )
+    plt.subplot(4, 2, i + 1)
+    plt.boxplot(box_plot_data)
+    plt.title(inst_name)
+    plt.xticks(list(range(1, len(ALG_NAMES) + 1)), TICKS_ALG_NAMES)
+plt.tight_layout()
+plt.savefig(FIGURES_DIR + 'quality.png')
+plt.show()
