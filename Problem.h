@@ -20,7 +20,7 @@ public:
 	ObjectiveType objectivetype;
 
 	// Loads problem instance from the given file. Returns true if succesful.
-	virtual bool load(char *filename){};
+	virtual bool load(string filename){};
 };
 
 class QAP : public Problem
@@ -28,7 +28,7 @@ class QAP : public Problem
 public:
 	int n, **A, **B;
 
-	bool load(char *filename);
+	bool load(string filename);
 };
 
 #endif /* Problem_HEADER */

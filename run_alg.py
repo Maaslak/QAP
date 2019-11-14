@@ -26,15 +26,37 @@ INSTANCES = [
 ]
 
 BUILD_DIR = "build/"
+# -
+
+# ### 10 num iters
 
 # +
 import subprocess
-NUM_TIMES = 10
+NUM_TIMES = 90
 
 for i in range(NUM_TIMES):
     print("%d / %d" % (i + 1, NUM_TIMES))
     for name in INSTANCES:
-        args = [BUILD_DIR + "main", name]
+        args = [BUILD_DIR + "main", "--instance_name=" + name]
+        popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+        popen.wait()
+    
+print("Cool")
+# -
+
+# ### 400 num iters
+
+# +
+import subprocess
+NUM_TIMES = 9
+
+for i in range(NUM_TIMES):
+    print("%d / %d" % (i + 1, NUM_TIMES))
+    for name in INSTANCES:
+        args = [
+            BUILD_DIR + "main", 
+            "--instance_name=" + name, 
+            "--num_iter=40"]
         popen = subprocess.Popen(args, stdout=subprocess.PIPE)
         popen.wait()
     

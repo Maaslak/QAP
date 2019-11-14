@@ -5,8 +5,8 @@
 #include <iostream>
 
 
-Solution::Solution(QAP* qap): problem(qap){
-	metricsCollector = new Solution::MetricsCollector(10);
+Solution::Solution(QAP* qap, int maxNumIter): problem(qap){
+	metricsCollector = new Solution::MetricsCollector(maxNumIter);
 	permutation = new int[problem->n];
 	bestPermutation = new int[problem->n];
 }
@@ -20,6 +20,7 @@ Solution::~Solution(){
 void Solution::initRandomSolution()
 {
 	bestObjectiveValue = numeric_limits<int>::max();
+	objectiveFuncCallsNum = 0;
 	iota(permutation, permutation + problem->n, 0);
 
 	for (size_t i = 0; i < problem->n - 1; i++)
@@ -85,7 +86,7 @@ void Solution::calculateObjectiveValue()
 	objectiveFuncCallsNum++;
 }
 
-void Solution::naiveRandomSearch(int maxTime)
+void Solution::naiveRandomSearch(double maxTime)
 {
 	clock_t begin = clock();
 	do
@@ -100,7 +101,7 @@ void Solution::naiveRandomSearch(int maxTime)
 	} while (double(clock() - begin) < maxTime);
 }
 
-void Solution::lessNaiveRandomSearch(int maxTime)
+void Solution::lessNaiveRandomSearch(double maxTime)
 {
 	clock_t begin = clock();
 	do
@@ -156,8 +157,8 @@ void Solution::checkNextNeighbour()
 {
 	int swapA = get<0>(nextSwap);
 	int swapB = get<1>(nextSwap);
-	swap(permutation[swapA], permutation[swapB]);
 	updateObjectValue(swapA, swapB);
+	swap(permutation[swapA], permutation[swapB]);
 	swapB++;
 	if (swapB == swapA)
 	{
@@ -207,9 +208,9 @@ void Solution::performHeuristic(){
 	}
 }
 
-void Solution::setTime(double seconds)
+void Solution::setTime(double clocks)
 {
-	timeElapsed = seconds;
+	timeElapsed = clocks;
 }
 
 double Solution::getTime(){
@@ -235,14 +236,14 @@ void Solution::addMetricToFile(long* tab, ofstream& file){
 	};
 
 void Solution::updateMetrics(){
-	metricsCollector->updateMetrics(objectiveValue, objectiveFuncCallsNum);
+	metricsCollector->updateMetrics(bestObjectiveValue, objectiveFuncCallsNum);
 }
 
 void Solution::save(string filename, int numIter)
 {
 	ofstream file;
 	file.open(filename);
-	file << problem->n << " " << timeElapsed / numIter << "\n";
+	file << problem->n << " " << timeElapsed / CLOCKS_PER_SEC / numIter << "\n";
 	addMetricToFile(metricsCollector->startObjectiveValues, file);
 	addMetricToFile(metricsCollector->objectiveValues, file);
 	addMetricToFile(metricsCollector->numObjValCalls, file);

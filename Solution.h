@@ -65,9 +65,9 @@ public:
 	// Holder for next swap (to create a neighbour)
 	tuple<int, int> nextSwap = make_tuple(1, 0);
 
-	Solution(QAP* qap);
+	Solution(QAP*, int);
 
-	Solution() : Solution(NULL) {};
+	Solution() : Solution(NULL, -1) {};
 
 	~Solution();
 
@@ -87,10 +87,10 @@ public:
 	void updateBestSolution();
 
 	// Optimizes objective value by random algorithm with generating permutation every step
-	void naiveRandomSearch(int);
+	void naiveRandomSearch(double);
 
 	// Optimizes objective value by random algorithm with checking every swap in gen random solution
-	void lessNaiveRandomSearch(int);
+	void lessNaiveRandomSearch(double);
 
 	// Optimizes locally the objective function by steepest algorithm.
 	void steepestLocalSearch();
