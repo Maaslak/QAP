@@ -36,7 +36,7 @@ string resultFilename(string instanceName, string algName, int execId, int numIt
     return result.str();
 }
 
-long runAlg(Solution& solution, function<void()>* alg, int maxNumIter,  double& maxTime){
+long runAlg(Solution& solution, function<void()>* alg, int maxNumIter){
     int numIter = 0;   
     clock_t begin = clock();
     solution.setObjectiveFuncCallsNum(0); 
@@ -50,6 +50,12 @@ long runAlg(Solution& solution, function<void()>* alg, int maxNumIter,  double& 
     } while (numIter < maxNumIter || double(clock() - begin) < 100);
     // Setting mean of elapsed time    
     solution.setTime(double(clock() - begin));
+
+    return numIter;
+}
+
+long runAlgMaxTime(Solution& solution, function<void()>* alg, int maxNumIter, double& maxTime){
+    long numIter = runAlg(solution, alg, maxNumIter);
     if (maxTime < solution.getTime()){
         maxTime = solution.getTime();
     }
@@ -102,9 +108,9 @@ int main(int argc, char *argv[])
     vector<string> algorithmNames{
         "greedyLocalSearch",
         "steepestLocalSearch",
-        "heuristic",
         "lessNaiveRandomSearch",
-        "naiveRandomSearch"
+        "naiveRandomSearch",
+        "heuristic",
         };
 
     if (selectedAlgoritm.length())
@@ -138,19 +144,21 @@ int main(int argc, char *argv[])
         size_t i = 0;
         for (function<void()> alg: finiteAlgorithms)
         {
-            long numIter = runAlg(solution, &alg, maxNumIter, maxTime);
+            long numIter = runAlgMaxTime(solution, &alg, maxNumIter, maxTime);
             solution.save(resultFilename(instanceName, algorithmNames[i], execId, maxNumIter), numIter);
             i++;
         }
 
+        maxTime = maxTime/10;
+
         function<void()> infiniteAlgorithms[] = {
-            bind(&Solution::heuristic, ref(solution), maxTime),
             bind(&Solution::lessNaiveRandomSearch, ref(solution), maxTime),
             bind(&Solution::naiveRandomSearch, ref(solution), maxTime),
+            bind(&Solution::heuristic, ref(solution), maxTime),
         };
         
         for(function<void()> alg: infiniteAlgorithms){
-            long numIter = runAlg(solution, &alg, maxNumIter, maxTime);
+            long numIter = runAlg(solution, &alg, maxNumIter);
             solution.save(resultFilename(instanceName, algorithmNames[i], execId, maxNumIter), numIter);
             i++;
         }
