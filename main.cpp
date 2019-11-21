@@ -108,6 +108,7 @@ int main(int argc, char *argv[])
     vector<string> algorithmNames{
         "greedyLocalSearch",
         "steepestLocalSearch",
+        "simulatedAnnealing",
         "lessNaiveRandomSearch",
         "naiveRandomSearch",
         "heuristic",
@@ -132,6 +133,7 @@ int main(int argc, char *argv[])
     function<void()> finiteAlgorithms[] = {
         bind(&Solution::greedyLocalSearch, ref(solution)),
         bind(&Solution::steepestLocalSearch, ref(solution)),
+        bind(&Solution::simulatedAnnealing, ref(solution), NeighborhoodType::_2OPT, 0.9)
     };
 
     if (selectedAlgoritm.length())
