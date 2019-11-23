@@ -22,8 +22,8 @@ enum LocalSearchAlgorithm
 class Solution
 {
 private:
-	void oneStepUpdate(int, int, int, int);
-	void updateObjectValue(int, int);
+	void oneStepUpdate(int&, int, int, int, int);
+	int calcObjectValueChange(int, int);
 
 	// time elapsed (needs to be set outside) with setTime
 	double timeElapsed;
@@ -80,7 +80,8 @@ public:
 
 	bool hasNextNeighbour();
 
-	void checkNextNeighbour();
+	// Returns objective value change for the next neighbour
+	int checkNextNeighbour();
 
 	void initRandomSolution();
 

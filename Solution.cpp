@@ -40,34 +40,36 @@ void Solution::updateBestSolution()
 	}
 }
 
-void Solution::oneStepUpdate(int first, int second, int permFirst, int permSecond)
+void Solution::oneStepUpdate(int &base, int first, int second, int permFirst, int permSecond)
 {
 	permFirst = permutation[permFirst];
 	permSecond = permutation[permSecond];
-	objectiveValue += problem->A[first][second] * (problem->B[permFirst][permSecond] - problem->B[permutation[first]][permutation[second]]);
+	base += problem->A[first][second] * (problem->B[permFirst][permSecond] - problem->B[permutation[first]][permutation[second]]);
 }
 
-void Solution::updateObjectValue(int firstIdx, int secondIdx)
+int Solution::calcObjectValueChange(int firstIdx, int secondIdx)
 {
+	int change = 0;
 	if (firstIdx != secondIdx)
 	{
 		for (size_t i = 0; i < problem->n; i++)
 		{
 			if (i != firstIdx && i != secondIdx)
 			{
-				oneStepUpdate(i, firstIdx, i, secondIdx);
-				oneStepUpdate(i, secondIdx, i, firstIdx);
-				oneStepUpdate(firstIdx, i, secondIdx, i);
-				oneStepUpdate(secondIdx, i, firstIdx, i);
+				oneStepUpdate(change, i, firstIdx, i, secondIdx);
+				oneStepUpdate(change, i, secondIdx, i, firstIdx);
+				oneStepUpdate(change, firstIdx, i, secondIdx, i);
+				oneStepUpdate(change, secondIdx, i, firstIdx, i);
 			}
 			if (i == firstIdx)
 			{
-				oneStepUpdate(i, secondIdx, secondIdx, firstIdx);
-				oneStepUpdate(secondIdx, i, firstIdx, secondIdx);
+				oneStepUpdate(change, i, secondIdx, secondIdx, firstIdx);
+				oneStepUpdate(change, secondIdx, i, firstIdx, secondIdx);
 			}
 		}
 		objectiveFuncCallsNum++;
 	}
+	return change;
 }
 
 void Solution::calculateObjectiveValue()
@@ -110,7 +112,7 @@ void Solution::lessNaiveRandomSearch(double maxTime)
 		{
 
 			long second = i + rand() % (problem->n - i - 1);
-			updateObjectValue(i, second);
+			objectiveValue += calcObjectValueChange(i, second);
 			swap(permutation[i], permutation[second]);
 			updateBestSolution();
 		}
@@ -133,16 +135,26 @@ void Solution::localSearch(LocalSearchAlgorithm algorithm)
 	while (improved)
 	{
 		improved = false;
+		tuple<int, int> bestSwap = nextSwap;
+		int currentBestChange = 0;
 		while (hasNextNeighbour())
 		{
-			checkNextNeighbour();
-			if (objectiveValue < bestObjectiveValue)
+			tuple<int, int> neighbourSwap = nextSwap;
+			int change = checkNextNeighbour();
+			if (change < currentBestChange)
 			{
-				updateBestSolution();
+				bestSwap = neighbourSwap;
+				currentBestChange = change;
 				improved = true;
-				if (algorithm = _Greedy)
+				if (algorithm == _Greedy){
 					break;
+				}
 			}
+		}
+		if(improved){
+			objectiveValue += calcObjectValueChange(get<0>(bestSwap), get<1>(bestSwap));
+			swap(permutation[get<0>(bestSwap)], permutation[get<1>(bestSwap)]);
+			updateBestSolution();
 		}
 		nextSwap = make_tuple(1, 0);
 	}
@@ -153,12 +165,11 @@ bool Solution::hasNextNeighbour()
 	return get<0>(nextSwap) < problem->n;
 }
 
-void Solution::checkNextNeighbour()
+int Solution::checkNextNeighbour()
 {
 	int swapA = get<0>(nextSwap);
 	int swapB = get<1>(nextSwap);
-	updateObjectValue(swapA, swapB);
-	swap(permutation[swapA], permutation[swapB]);
+	int result = calcObjectValueChange(swapA, swapB);
 	swapB++;
 	if (swapB == swapA)
 	{
@@ -166,6 +177,7 @@ void Solution::checkNextNeighbour()
 		swapA++;
 	}
 	nextSwap = make_tuple(swapA, swapB);
+	return result;
 }
 
 void Solution::heuristic(int maxTime)
