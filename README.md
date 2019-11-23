@@ -4,15 +4,15 @@
 Build with vscode build task using g++.
 Boost library is required (used to parse args)
 
-###Overleaf report URL:
+### Overleaf report URL:
 https://www.overleaf.com/project/5dbedd5c15433f00015c02b2
 
-###GIT + Jupyter
+### GIT + Jupyter
 To use version controll with jupyter notebook
 please use jupytext:
 https://nextjournal.com/schmudde/how-to-version-control-jupyter
 
-###Results formatting
+### Results formatting
 filename: [instanceName]\_[methodName]\_[exec_id]
 
 Content:
