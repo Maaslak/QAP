@@ -23,7 +23,7 @@ class Solution
 {
 private:
 	void oneStepUpdate(int&, int, int, int, int);
-	int calcObjectValue(int, int, int);
+	int calcObjectValueChange(int, int);
 
 	// time elapsed (needs to be set outside) with setTime
 	double timeElapsed;
@@ -80,7 +80,7 @@ public:
 
 	bool hasNextNeighbour();
 
-	// Returns objective value of the next neighbour
+	// Returns objective value change for the next neighbour
 	int checkNextNeighbour();
 
 	void initRandomSolution();

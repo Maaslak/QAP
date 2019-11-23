@@ -47,28 +47,29 @@ void Solution::oneStepUpdate(int &base, int first, int second, int permFirst, in
 	base += problem->A[first][second] * (problem->B[permFirst][permSecond] - problem->B[permutation[first]][permutation[second]]);
 }
 
-int Solution::calcObjectValue(int base, int firstIdx, int secondIdx)
+int Solution::calcObjectValueChange(int firstIdx, int secondIdx)
 {
+	int change = 0;
 	if (firstIdx != secondIdx)
 	{
 		for (size_t i = 0; i < problem->n; i++)
 		{
 			if (i != firstIdx && i != secondIdx)
 			{
-				oneStepUpdate(base, i, firstIdx, i, secondIdx);
-				oneStepUpdate(base, i, secondIdx, i, firstIdx);
-				oneStepUpdate(base, firstIdx, i, secondIdx, i);
-				oneStepUpdate(base, secondIdx, i, firstIdx, i);
+				oneStepUpdate(change, i, firstIdx, i, secondIdx);
+				oneStepUpdate(change, i, secondIdx, i, firstIdx);
+				oneStepUpdate(change, firstIdx, i, secondIdx, i);
+				oneStepUpdate(change, secondIdx, i, firstIdx, i);
 			}
 			if (i == firstIdx)
 			{
-				oneStepUpdate(base, i, secondIdx, secondIdx, firstIdx);
-				oneStepUpdate(base, secondIdx, i, firstIdx, secondIdx);
+				oneStepUpdate(change, i, secondIdx, secondIdx, firstIdx);
+				oneStepUpdate(change, secondIdx, i, firstIdx, secondIdx);
 			}
 		}
 		objectiveFuncCallsNum++;
 	}
-	return base;
+	return change;
 }
 
 void Solution::calculateObjectiveValue()
@@ -111,7 +112,7 @@ void Solution::lessNaiveRandomSearch(double maxTime)
 		{
 
 			long second = i + rand() % (problem->n - i - 1);
-			objectiveValue = calcObjectValue(objectiveValue, i, second);
+			objectiveValue += calcObjectValueChange(i, second);
 			swap(permutation[i], permutation[second]);
 			updateBestSolution();
 		}
@@ -135,15 +136,15 @@ void Solution::localSearch(LocalSearchAlgorithm algorithm)
 	{
 		improved = false;
 		tuple<int, int> bestSwap = nextSwap;
-		int currentBestObjectiveValue = bestObjectiveValue;
+		int currentBestChange = 0;
 		while (hasNextNeighbour())
 		{
 			tuple<int, int> neighbourSwap = nextSwap;
-			int neighbourObjectiveValue = checkNextNeighbour();
-			if (neighbourObjectiveValue < currentBestObjectiveValue)
+			int change = checkNextNeighbour();
+			if (change < currentBestChange)
 			{
 				bestSwap = neighbourSwap;
-				currentBestObjectiveValue = neighbourObjectiveValue;
+				currentBestChange = change;
 				improved = true;
 				if (algorithm == _Greedy){
 					break;
@@ -151,7 +152,7 @@ void Solution::localSearch(LocalSearchAlgorithm algorithm)
 			}
 		}
 		if(improved){
-			objectiveValue = calcObjectValue(objectiveValue, get<0>(bestSwap), get<1>(bestSwap));
+			objectiveValue += calcObjectValueChange(get<0>(bestSwap), get<1>(bestSwap));
 			swap(permutation[get<0>(bestSwap)], permutation[get<1>(bestSwap)]);
 			updateBestSolution();
 		}
@@ -168,7 +169,7 @@ int Solution::checkNextNeighbour()
 {
 	int swapA = get<0>(nextSwap);
 	int swapB = get<1>(nextSwap);
-	int result = calcObjectValue(objectiveValue, swapA, swapB);
+	int result = calcObjectValueChange(swapA, swapB);
 	swapB++;
 	if (swapB == swapA)
 	{
