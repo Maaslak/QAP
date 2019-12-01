@@ -48,14 +48,14 @@ private:
 
 	public:
 		int numMeas;
-		long* startObjectiveValues,* objectiveValues,* numObjValCalls;
+		long* startObjectiveValues,* objectiveValues,* numObjValCalls, ** permutations;
 
 		MetricsCollector() {};
-		MetricsCollector(int);
+		MetricsCollector(int, int);
 		~MetricsCollector();
 
 		void addStartObjectiveValue(long);
-		void updateMetrics(long, long);
+		void updateMetrics(long, long, int*, int);
 	};
 
 	MetricsCollector* metricsCollector;

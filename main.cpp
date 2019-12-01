@@ -45,7 +45,8 @@ long runAlg(Solution& solution, function<void()>* alg, int maxNumIter){
         solution.initRandomSolution();
         (*alg)();
         numIter++;
-        solution.updateMetrics();
+        if (numIter < maxNumIter)
+            solution.updateMetrics();
         // cout << algorithmNames[i] << ": " << solution.bestObjectiveValue << endl;
     } while (numIter < maxNumIter || double(clock() - begin) < 100);
     // Setting mean of elapsed time    
