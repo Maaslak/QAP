@@ -160,6 +160,64 @@ void Solution::localSearch(LocalSearchAlgorithm algorithm)
 	}
 }
 
+void Solution::decrementTemerature(){
+	this->asConfig.temperature = this->asConfig.alpha * this->asConfig.temperature;
+}
+
+void Solution::initTemperature(int numIter=100){
+	clock_t begin = clock();
+	int sum;
+	for (size_t i = 0; i < numIter; i++)
+	{
+		for (size_t i = 0; i < problem->n - 1; i++)
+		{
+			int prevObjVal = this->objectiveValue;
+			long second = i + rand() % (problem->n - i - 1);
+			sum += calcObjectValueChange(i, second);
+			swap(permutation[i], permutation[second]);
+			updateBestSolution();
+		}	
+	}
+	this->asConfig.temperature = -(double(sum) / (numIter * problem->n)) / log(0.95);
+}
+
+void Solution::simulatedAnnealing(NeighborhoodType neighborhoodType, double alpha){
+	this->asConfig.alpha = alpha;
+	if (neighborhoodType == NeighborhoodType::_2OPT)
+		this->asConfig.L = this->problem->n * (this->problem->n - 1) / 2;
+	if (neighborhoodType == NeighborhoodType::_3OPT)
+		cout << "TODO";
+
+	clock_t begin = clock();
+
+	this->initTemperature();
+
+	int l = 0;
+	double thresholdTemperature;
+	do{
+		if (l % this->asConfig.L == 0)
+			this->decrementTemerature();
+		l = (l + 1) % this->asConfig.L;
+		
+		tuple<int, int> neighbourSwap = nextSwap;
+
+		if (!hasNextNeighbour())
+			nextSwap = make_tuple(1, 0);
+		
+		int diffObjValue = checkNextNeighbour();
+
+		thresholdTemperature = exp(diffObjValue / asConfig.temperature);
+
+		if (diffObjValue < 0
+			|| ((double) rand() / (RAND_MAX)) < thresholdTemperature){
+				objectiveValue += diffObjValue;
+				swap(permutation[get<0>(neighbourSwap)], permutation[get<1>(neighbourSwap)]);
+				updateBestSolution();
+				nextSwap = make_tuple(1, 0);
+		}
+	}while(thresholdTemperature < 0.01);
+}
+
 bool Solution::hasNextNeighbour()
 {
 	return get<0>(nextSwap) < problem->n;
