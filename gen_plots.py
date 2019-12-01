@@ -60,7 +60,7 @@ METRIC_NAMES = [
     "start_obj_val",
     "end_obj_val",
     "num_obj_val_calls",
-    "best_permutation"
+    "best_permutations"
 ]
 # -
 # ## Read metrics data from files
@@ -88,7 +88,7 @@ def parse_file(file_lines):
         "start_obj_val": cast_to_type(file_lines[1], int),
         "end_obj_val": cast_to_type(file_lines[2], int),
         "num_obj_val_calls": cast_to_type(file_lines[3], int),
-        "best_permutation": cast_to_type(file_lines[4], int)
+        "best_permutations": [cast_to_type(file_line, int) for file_line in file_lines[4:]]
     }
 
 def parse_n_alg_inst(data, instance_n_map, n, inst_name, alg_name, num_iter=10):
@@ -121,7 +121,7 @@ instance_n_map = {}
 
 for inst_name in INSTANCE_NAMES:
     for alg_name in ALG_NAMES:
-        parse_n_alg_inst(data, instance_n_map, 5, inst_name, alg_name)
+        parse_n_alg_inst(data, instance_n_map, 1, inst_name, alg_name)
 
 
 # +
@@ -129,7 +129,7 @@ data_big = {}
 
 for inst_name in INSTANCE_NAMES:
     for alg_name in ALG_NAMES:
-        parse_n_alg_inst(data_big, instance_n_map, 40, inst_name, alg_name, num_iter=10)
+        parse_n_alg_inst(data_big, instance_n_map, 1, inst_name, alg_name, num_iter=10)
 
 # +
 opts = {}

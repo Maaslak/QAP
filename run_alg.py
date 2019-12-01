@@ -32,11 +32,12 @@ BUILD_DIR = "build/"
 
 # +
 import subprocess
-NUM_TIMES = 90
+NUM_TIMES = 1
 
 for i in range(NUM_TIMES):
     print("%d / %d" % (i + 1, NUM_TIMES))
     for name in INSTANCES:
+        print(name)
         args = [BUILD_DIR + "main", "--instance_name=" + name]
         popen = subprocess.Popen(args, stdout=subprocess.PIPE)
         popen.wait()
