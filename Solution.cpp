@@ -3,6 +3,7 @@
 #include <vector>
 #include <numeric>
 #include <iostream>
+#include <algorithm>
 
 
 Solution::Solution(QAP* qap, int maxNumIter): problem(qap){
@@ -283,6 +284,60 @@ void Solution::performHeuristic(){
 		calculateObjectiveValue();
 		updateBestSolution();
 	}
+}
+
+void Solution::tabuSearch()
+{
+	int k = problem->n/10;
+	int L = 5*(problem->n*(problem->n-1));
+	vector<TabuCandidate> candidates;
+	vector<vector<int>> tabuList( problem->n , vector<int> (problem->n, 0));
+	clock_t begin = clock();
+	int withoutImprovement = 0;
+	do
+	{	
+		candidates.clear();
+		while (hasNextNeighbour())
+		{
+			tuple<int, int> swap = nextSwap;
+			int change = checkNextNeighbour();
+			if(tabuList[get<0>(swap)][get<1>(swap)]>0){
+				tabuList[get<0>(swap)][get<1>(swap)]--;
+				if(objectiveValue + change >= bestObjectiveValue) continue; //aspiration 
+			}
+			TabuCandidate candidate;
+			candidate.swap = swap;
+			candidate.change = change;
+			candidates.push_back(candidate);
+		}
+		sort( candidates.begin( ), candidates.end( ), [ ]( const auto& a, const auto& b ){return a.change < b.change;});
+		int size = min(k, (int)candidates.size());
+		candidates.resize(size);
+
+		int threshold = candidates[size-1].change;
+		int i = 0;
+		while(candidates[i].change<=threshold && i < candidates.size()){
+			//Make step
+			objectiveValue += candidates[i].change;
+			swap(permutation[get<0>(candidates[i].swap)], permutation[get<1>(candidates[i].swap)]);
+			if(objectiveValue < bestObjectiveValue){
+				withoutImprovement = 0;
+			}else{
+				withoutImprovement++;
+			}
+			updateBestSolution();
+			tabuList[get<0>(candidates[i].swap)][get<1>(candidates[i].swap)] = problem->n/4;
+			i++;
+
+			//Update changes for the rest
+			for(int j=i; j<candidates.size(); j++)
+			{
+				candidates[j].change = calcObjectValueChange(get<0>(candidates[j].swap),get<1>(candidates[j].swap));
+			}
+			sort( candidates.begin( ) + i, candidates.end( ), [ ]( const auto& a, const auto& b ){return a.change < b.change;});
+		}
+		nextSwap = make_tuple(1, 0);
+	} while (withoutImprovement < L);
 }
 
 void Solution::setTime(double clocks)

@@ -62,6 +62,12 @@ private:
 
 	void addMetricToFile(long* tab, ofstream& file);
 
+	struct TabuCandidate
+	{
+		tuple<int, int> swap;
+		int change;
+	};
+
 public:
 	// Problem associated with this solution
 	QAP* problem;
@@ -113,6 +119,9 @@ public:
 
 	// Optimizes objective value by using simple heuristic
 	void heuristic(int);
+
+	// Optimizes objective value using tabu search algorithm
+	void tabuSearch();
 
 	void initTemperature(int);
 
