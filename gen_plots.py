@@ -183,7 +183,7 @@ def minimum_accumulate(data, axis):
     return np.minimum.accumulate(np.array(data).reshape(-1))
 
 # Cumulative minimum Cumulative mean
-apply_metric_func(data_big, "end_obj_val", minimum_accumulate, "min_acc")
+apply_metric_func(data_big, "end_obj_val", minimum_accumulate, "min_acc", SMALL_INSTANCE_NAMES)
 
 def mean_accumulate(data, axis):
     data = np.array(data).reshape(-1)
@@ -406,7 +406,7 @@ for alg_name, marker, x_move in zip(ALG_NAMES, MARKERS, X_MOVE):
         Y.append(data[inst_name][metric_name][alg_name])
     Y = np.array(Y).reshape(len(INSTANCE_NAMES), -1)
     plt.errorbar(
-            np.arange(len(INSTANCE_NAMES)) + x_move, 
+            np.arange(len(INSTANCE_NAMES)), # + x_move, 
             np.mean(Y, axis=1), 
             np.std(Y, axis=1),
             marker=marker,
@@ -451,13 +451,15 @@ plt.show()
 
 # ### Start quality vs END Qality
 
+import math
+
 # +
 metric_name_Y = "quality"
 metric_name_X = "quality_start"
-plt.figure(figsize=(10,5))
+plt.figure(figsize=(10,14))
 
-for i, inst_name in SMALL_INSTANCE_NAMES: #enumerate(["chr12a", "sko100a"]):
-    plt.subplot(1, 2, i + 1)
+for i, inst_name in enumerate(SMALL_INSTANCE_NAMES): #enumerate(["chr12a", "sko100a"]):
+    plt.subplot(math.ceil(len(SMALL_INSTANCE_NAMES) / 2), 2, i + 1)
     for alg_name in LS_NAMES:
         X = (
             np.array(data_big[inst_name][metric_name_X][alg_name]).reshape(-1)
@@ -488,8 +490,8 @@ plt.show()
 metric_name = "min_acc_end_obj_val"
 plt.figure(figsize=(10,10))
 
-for i, inst_name in SMALL_INSTANCE_NAMES:# enumerate(["chr12a", "tho150", "tai256c", "sko100a"]):
-    plt.subplot(2, 2, i + 1)
+for i, inst_name in enumerate(SMALL_INSTANCE_NAMES):# enumerate(["chr12a", "tho150", "tai256c", "sko100a"]):
+    plt.subplot(math.ceil(len(SMALL_INSTANCE_NAMES) / 2), 2, i + 1)
     for alg_name in LS_NAMES:
         Y = (
             np.array(data_big[inst_name][metric_name][alg_name]).reshape(-1)
@@ -515,8 +517,8 @@ metric_name = "mean_acc_end_obj_val"
 std_metric_name = "std_acc_end_obj_val"
 plt.figure(figsize=(10,10))
 
-for i, inst_name in SMALL_INSTANCE_NAMES: # enumerate(["chr12a", "tho150", "lipa40b", "sko100a"]):
-    plt.subplot(2, 2, i + 1)
+for i, inst_name in enumerate(SMALL_INSTANCE_NAMES): # enumerate(["chr12a", "tho150", "lipa40b", "sko100a"]):
+    plt.subplot(math.ceil(len(SMALL_INSTANCE_NAMES) / 2), 2, i + 1)
     for alg_name in LS_NAMES:
         Y = np.array(data_big[inst_name][metric_name][alg_name]).reshape(-1)
         X = np.arange(len(Y))
@@ -559,19 +561,19 @@ def apply_similarity_to_opt(data, opts):
             inst_data.setdefault(
                 "similarity_opt", {}
             )[alg_name] = [calc_similarity_list(
-                permutation[alg_name],
-                opts[inst_name]["opt_per"] for permutation in inst_data["best_permutations"]]
-            )
+                permutation,
+                opts[inst_name]["opt_per"]) for permutation in inst_data["best_permutations"][alg_name]]
+
 apply_similarity_to_opt(data_big, opts)
 
 # +
-metric_X = "quality_best_numit"
+metric_X = "quality"
 metric_Y = "similarity_opt"
 
-plt.figure(figsize=(10,5))
+plt.figure(figsize=(10,15))
 
-for i, inst_name in SMALL_INSTANCE_NAMES: # enumerate(["chr12a", "tai256c"]):
-    plt.subplot(1, 2, i + 1)
+for i, inst_name in enumerate(SMALL_INSTANCE_NAMES): # enumerate(["chr12a", "tai256c"]):
+    plt.subplot(math.ceil(len(SMALL_INSTANCE_NAMES) / 2), 2, i + 1)
     for alg_name in LS_NAMES:
         X = (
             np.array(data_big[inst_name][metric_X][alg_name]).reshape(-1)
@@ -607,8 +609,12 @@ def apply_similarity_interior(data):
                             permutation1,
                             permutation2
                         )
-                for i, permutation1 in enumerate(inst_data["best_permutation"][alg_name])
-                for j, permutation2 in enumerate(inst_data["best_permutation"][alg_name])
+                for permutations1, permutations2 in zip(
+                    inst_data["best_permutations"][alg_name], 
+                    inst_data["best_permutations"][alg_name]
+                )
+                for i, permutation1 in enumerate(permutations1)
+                for j, permutation2 in enumerate(permutations2)
                 if i != j
             ]
                         
@@ -624,8 +630,8 @@ def delta_quality_interior(data):
                 "delta_quality_interior", {}
             )[alg_name] = [
                 abs(quality1 - quality2)
-                for i, quality1 in enumerate(inst_data["quality_best_numit"][alg_name])
-                for j, quality2 in enumerate(inst_data["quality_best_numit"][alg_name])
+                for i, quality1 in enumerate(inst_data["quality"][alg_name])
+                for j, quality2 in enumerate(inst_data["quality"][alg_name])
                 if i != j
             ]
                         
@@ -636,10 +642,10 @@ delta_quality_interior(data_big)
 metric_X = "delta_quality_interior"
 metric_Y = "similarity"
 
-plt.figure(figsize=(10,10))
+plt.figure(figsize=(10,20))
 
-for i, inst_name in SMALL_INSTANCE_NAMES: # enumerate(["chr12a", "tai256c"]):
-    plt.subplot(2, 1, i + 1)
+for i, inst_name in enumerate(SMALL_INSTANCE_NAMES): # enumerate(["chr12a", "tai256c"]):
+    plt.subplot(math.ceil(len(SMALL_INSTANCE_NAMES) / 2), 1, i + 1)
     for alg_name in LS_NAMES:
         X = (
             np.array(data_big[inst_name][metric_X][alg_name]).reshape(-1)
