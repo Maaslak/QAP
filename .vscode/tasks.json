@@ -6,13 +6,13 @@
       "label": "main build",
       "command": "/usr/bin/g++",
       "args": [
-        "-lboost_program_options",
         "${workspaceFolder}/main.cpp",
         "${workspaceFolder}/Solution.cpp",
         "${workspaceFolder}/Problem.cpp",        
         "-g",
         "-o",
-        "${workspaceFolder}/build/main"
+        "${workspaceFolder}/build/main",
+        "-lboost_program_options"
       ],
       "options": {
         "cwd": "/usr/bin"

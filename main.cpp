@@ -108,9 +108,10 @@ int main(int argc, char *argv[])
     vector<string> algorithmNames{
         "greedyLocalSearch",
         "steepestLocalSearch",
+        "tabuSearch",
         "lessNaiveRandomSearch",
         "naiveRandomSearch",
-        "heuristic",
+        "heuristic"
         };
 
     if (selectedAlgoritm.length())
@@ -132,6 +133,7 @@ int main(int argc, char *argv[])
     function<void()> finiteAlgorithms[] = {
         bind(&Solution::greedyLocalSearch, ref(solution)),
         bind(&Solution::steepestLocalSearch, ref(solution)),
+        bind(&Solution::tabuSearch, ref(solution))
     };
 
     if (selectedAlgoritm.length())
@@ -154,7 +156,7 @@ int main(int argc, char *argv[])
         function<void()> infiniteAlgorithms[] = {
             bind(&Solution::lessNaiveRandomSearch, ref(solution), maxTime),
             bind(&Solution::naiveRandomSearch, ref(solution), maxTime),
-            bind(&Solution::heuristic, ref(solution), maxTime),
+            bind(&Solution::heuristic, ref(solution), maxTime)
         };
         
         for(function<void()> alg: infiniteAlgorithms){
