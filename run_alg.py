@@ -25,6 +25,8 @@ INSTANCES = [
     "tai256c",
 ]
 
+SMALL_INSTANCES = INSTANCES[:-3]
+
 BUILD_DIR = "build/"
 # -
 
@@ -49,11 +51,11 @@ print("Cool")
 
 # +
 import subprocess
-NUM_TIMES = 9
+NUM_TIMES = 10
 
 for i in range(NUM_TIMES):
     print("%d / %d" % (i + 1, NUM_TIMES))
-    for name in INSTANCES:
+    for name in SMALL_INSTANCES:
         args = [
             BUILD_DIR + "main", 
             "--instance_name=" + name, 

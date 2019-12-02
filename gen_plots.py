@@ -26,6 +26,7 @@ ALG_NAMES = [
     "lessNaiveRandomSearch",
     "naiveRandomSearch",
     "steepestLocalSearch",
+    "simulatedAnnealing"
 ]
 
 LS_NAMES = [
@@ -43,6 +44,8 @@ INSTANCE_NAMES = [
     "tho150",
     "tai256c",
 ]
+
+SMALL_INSTANCE_NAMES = INSTANCE_NAMES[:-3]
 
 Ns = [
     12,
@@ -127,9 +130,9 @@ for inst_name in INSTANCE_NAMES:
 # +
 data_big = {}
 
-for inst_name in INSTANCE_NAMES:
+for inst_name in SMALL_INSTANCE_NAMES:
     for alg_name in ALG_NAMES:
-        parse_n_alg_inst(data_big, instance_n_map, 1, inst_name, alg_name, num_iter=10)
+        parse_n_alg_inst(data_big, instance_n_map, 10, inst_name, alg_name, num_iter=40)
 
 # +
 opts = {}
@@ -152,8 +155,8 @@ for inst_name in INSTANCE_NAMES:
 
 # ## Calc required metics
 
-def apply_metric_func(data: dict, metric_name, func, func_name):
-    for inst_name in INSTANCE_NAMES:
+def apply_metric_func(data: dict, metric_name, func, func_name, instance_names = INSTANCE_NAMES):
+    for inst_name in instance_names:
         for alg_name in ALG_NAMES:
             inst_data = data[inst_name]
             inst_data.setdefault(
@@ -165,7 +168,7 @@ def apply_metric_func(data: dict, metric_name, func, func_name):
 #
 # opt_obj_val / obj_val
 
-len(data_big[INSTANCE_NAMES[0]]['end_obj_val'][ALG_NAMES[0]][0])
+len(data_big[SMALL_INSTANCE_NAMES[0]]['end_obj_val'][ALG_NAMES[0]][0])
 
 # +
 import numpy as np
@@ -195,15 +198,15 @@ def std_accumulate(data, axis):
     ]
     
     
-apply_metric_func(data_big, "end_obj_val", mean_accumulate, "mean_acc")
-apply_metric_func(data_big, "end_obj_val", std_accumulate, "std_acc")
+apply_metric_func(data_big, "end_obj_val", mean_accumulate, "mean_acc", SMALL_INSTANCE_NAMES)
+apply_metric_func(data_big, "end_obj_val", std_accumulate, "std_acc", SMALL_INSTANCE_NAMES)
 # -
 
-data_big[INSTANCE_NAMES[0]]['mean_acc_end_obj_val'][ALG_NAMES[0]].shape
+data_big[SMALL_INSTANCE_NAMES[0]]['mean_acc_end_obj_val'][ALG_NAMES[0]].shape
 
 
-def calc_quality(data, opts):
-    for inst_name in INSTANCE_NAMES:
+def calc_quality(data, opts, instance_names=INSTANCE_NAMES):
+    for inst_name in instance_names:
         for alg_name in ALG_NAMES:
             inst_data = data[inst_name]
             inst_data.setdefault(
@@ -213,11 +216,11 @@ def calc_quality(data, opts):
                 / np.array(inst_data["end_obj_val"][alg_name])
             )
 calc_quality(data, opts)
-calc_quality(data_big, opts)
+calc_quality(data_big, opts, SMALL_INSTANCE_NAMES)
 
 
-def calc_quality_start(data, opts):
-    for inst_name in INSTANCE_NAMES:
+def calc_quality_start(data, opts, instance_names=INSTANCE_NAMES):
+    for inst_name in instance_names:
         for alg_name in ALG_NAMES:
             inst_data = data[inst_name]
             inst_data.setdefault(
@@ -227,7 +230,7 @@ def calc_quality_start(data, opts):
                 / np.array(inst_data["start_obj_val"][alg_name])
             )
 calc_quality_start(data, opts)
-calc_quality_start(data_big, opts)
+calc_quality_start(data_big, opts, SMALL_INSTANCE_NAMES)
 
 
 def calc_quality_best(data, opts):
@@ -244,7 +247,7 @@ calc_quality_best(data, opts)
 
 
 def calc_quality_best_per_numit(data, opts):
-    for inst_name in INSTANCE_NAMES:
+    for inst_name in SMALL_INSTANCE_NAMES:
         for alg_name in ALG_NAMES:
             inst_data = data[inst_name]
             inst_data.setdefault(
@@ -290,15 +293,23 @@ TICKS_ALG_NAMES_MAP = {
     "lessNaiveRandomSearch": "LNRS",
     "naiveRandomSearch": "NRS",
     "steepestLocalSearch": "SLS",
+    "simulatedAnnealing" : "SA"
 }
 
 TICKS_ALG_NAMES = [TICKS_ALG_NAMES_MAP[alg_name] for alg_name in ALG_NAMES]
 
-MARKERS = ".<ov^"
+MARKERS = ".<ov^P"
 MARKERS = [marker for marker in MARKERS]
+
+if len(TICKS_ALG_NAMES) != len(ALG_NAMES):
+    raise ValueError("len(TICKS_ALG_NAMES) != len(ALG_NAMES)")
+if len(MARKERS) != len(ALG_NAMES):
+    raise ValueError("len(MARKERS) != len(ALG_NAMES)")
 
 X_MOVE = np.linspace(-5, 5, len(ALG_NAMES))
 # -
+
+
 
 len(INSTANCE_NAMES)
 
@@ -314,7 +325,7 @@ for i, inst_name in enumerate(INSTANCE_NAMES):
         box_plot_data.append(
             np.array(data[inst_name][metric_name][alg_name])[0]
         )
-    plt.subplot(4, 2, i + 1)
+    plt.subplot(5, 2, i + 1)
     plt.boxplot(box_plot_data)
     plt.title("Nazwa instancji " + inst_name)
     plt.xticks(list(range(1, len(ALG_NAMES) + 1)), TICKS_ALG_NAMES)
@@ -445,7 +456,7 @@ metric_name_Y = "quality"
 metric_name_X = "quality_start"
 plt.figure(figsize=(10,5))
 
-for i, inst_name in enumerate(["chr12a", "sko100a"]):
+for i, inst_name in SMALL_INSTANCE_NAMES: #enumerate(["chr12a", "sko100a"]):
     plt.subplot(1, 2, i + 1)
     for alg_name in LS_NAMES:
         X = (
@@ -477,7 +488,7 @@ plt.show()
 metric_name = "min_acc_end_obj_val"
 plt.figure(figsize=(10,10))
 
-for i, inst_name in enumerate(["chr12a", "tho150", "tai256c", "sko100a"]):
+for i, inst_name in SMALL_INSTANCE_NAMES:# enumerate(["chr12a", "tho150", "tai256c", "sko100a"]):
     plt.subplot(2, 2, i + 1)
     for alg_name in LS_NAMES:
         Y = (
@@ -504,7 +515,7 @@ metric_name = "mean_acc_end_obj_val"
 std_metric_name = "std_acc_end_obj_val"
 plt.figure(figsize=(10,10))
 
-for i, inst_name in enumerate(["chr12a", "tho150", "lipa40b", "sko100a"]):
+for i, inst_name in SMALL_INSTANCE_NAMES: # enumerate(["chr12a", "tho150", "lipa40b", "sko100a"]):
     plt.subplot(2, 2, i + 1)
     for alg_name in LS_NAMES:
         Y = np.array(data_big[inst_name][metric_name][alg_name]).reshape(-1)
@@ -542,14 +553,14 @@ def calc_similarity_list(perm1_list, perm2):
     ]
 
 def apply_similarity_to_opt(data, opts):
-    for inst_name in INSTANCE_NAMES:
+    for inst_name in SMALL_INSTANCE_NAMES:
         for alg_name in ALG_NAMES:
             inst_data = data[inst_name]
             inst_data.setdefault(
                 "similarity_opt", {}
-            )[alg_name] = calc_similarity_list(
-                inst_data["best_permutation"][alg_name],
-                opts[inst_name]["opt_per"]
+            )[alg_name] = [calc_similarity_list(
+                permutation[alg_name],
+                opts[inst_name]["opt_per"] for permutation in inst_data["best_permutations"]]
             )
 apply_similarity_to_opt(data_big, opts)
 
@@ -559,7 +570,7 @@ metric_Y = "similarity_opt"
 
 plt.figure(figsize=(10,5))
 
-for i, inst_name in enumerate(["chr12a", "tai256c"]):
+for i, inst_name in SMALL_INSTANCE_NAMES: # enumerate(["chr12a", "tai256c"]):
     plt.subplot(1, 2, i + 1)
     for alg_name in LS_NAMES:
         X = (
@@ -586,7 +597,7 @@ plt.show()
 
 # +
 def apply_similarity_interior(data):
-    for inst_name in INSTANCE_NAMES:
+    for inst_name in SMALL_INSTANCE_NAMES:
         for alg_name in ALG_NAMES:
             inst_data = data[inst_name]
             inst_data.setdefault(
@@ -606,7 +617,7 @@ apply_similarity_interior(data_big)
 
 # +
 def delta_quality_interior(data):
-    for inst_name in INSTANCE_NAMES:
+    for inst_name in SMALL_INSTANCE_NAMES:
         for alg_name in ALG_NAMES:
             inst_data = data[inst_name]
             inst_data.setdefault(
@@ -627,7 +638,7 @@ metric_Y = "similarity"
 
 plt.figure(figsize=(10,10))
 
-for i, inst_name in enumerate(["chr12a", "tai256c"]):
+for i, inst_name in SMALL_INSTANCE_NAMES: # enumerate(["chr12a", "tai256c"]):
     plt.subplot(2, 1, i + 1)
     for alg_name in LS_NAMES:
         X = (
