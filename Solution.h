@@ -19,16 +19,28 @@ enum LocalSearchAlgorithm
 	_Steepest = 1
 };
 
+enum NeighborhoodType
+{
+	_2OPT = 0,
+	_3OPT = 1
+}; // Types of neigbourhood
+
 class Solution
 {
 private:
 	void oneStepUpdate(int&, int, int, int, int);
 	int calcObjectValueChange(int, int);
+	void decrementTemerature();
 
 	// time elapsed (needs to be set outside) with setTime
 	double timeElapsed;
 
 	long objectiveFuncCallsNum = 0;
+
+	struct ASConfig{
+		double temperature, alpha;
+		int L;
+	}asConfig;
 
 	class MetricsCollector{
 		int it = 0;
@@ -36,14 +48,14 @@ private:
 
 	public:
 		int numMeas;
-		long* startObjectiveValues,* objectiveValues,* numObjValCalls;
+		long* startObjectiveValues,* objectiveValues,* numObjValCalls, ** permutations;
 
 		MetricsCollector() {};
-		MetricsCollector(int);
+		MetricsCollector(int, int);
 		~MetricsCollector();
 
 		void addStartObjectiveValue(long);
-		void updateMetrics(long, long);
+		void updateMetrics(long, long, int*, int);
 	};
 
 	MetricsCollector* metricsCollector;
@@ -110,6 +122,10 @@ public:
 
 	// Optimizes objective value using tabu search algorithm
 	void tabuSearch();
+
+	void initTemperature(int);
+
+	void simulatedAnnealing(NeighborhoodType, double);
 
 	void setTime(double);
 

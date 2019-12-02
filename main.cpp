@@ -45,9 +45,10 @@ long runAlg(Solution& solution, function<void()>* alg, int maxNumIter){
         solution.initRandomSolution();
         (*alg)();
         numIter++;
-        solution.updateMetrics();
+        if (numIter < maxNumIter + 1)
+            solution.updateMetrics();
         // cout << algorithmNames[i] << ": " << solution.bestObjectiveValue << endl;
-    } while (numIter < maxNumIter || double(clock() - begin) < 100);
+    } while (numIter < maxNumIter + 1 || double(clock() - begin) < 100);
     // Setting mean of elapsed time    
     solution.setTime(double(clock() - begin));
 
@@ -109,6 +110,7 @@ int main(int argc, char *argv[])
         "greedyLocalSearch",
         "steepestLocalSearch",
         "tabuSearch",
+        "simulatedAnnealing",
         "lessNaiveRandomSearch",
         "naiveRandomSearch",
         "heuristic"
@@ -133,7 +135,8 @@ int main(int argc, char *argv[])
     function<void()> finiteAlgorithms[] = {
         bind(&Solution::greedyLocalSearch, ref(solution)),
         bind(&Solution::steepestLocalSearch, ref(solution)),
-        bind(&Solution::tabuSearch, ref(solution))
+        bind(&Solution::tabuSearch, ref(solution)),
+        bind(&Solution::simulatedAnnealing, ref(solution), NeighborhoodType::_2OPT, 0.9)
     };
 
     if (selectedAlgoritm.length())
