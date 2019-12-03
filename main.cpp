@@ -63,7 +63,7 @@ long runAlgMaxTime(Solution& solution, function<void()>* alg, int maxNumIter, do
     return numIter;
 }
 
-bool process_command_line(int argc, char** argv, string& instanceName, string& selectedAlgorithm, int& maxNumIter){
+bool process_command_line(int argc, char** argv, string& instanceName, string& selectedAlgorithm, int& maxNumIter, double& maxTime){
     try
     {
         namespace po = boost::program_options;
@@ -74,6 +74,7 @@ bool process_command_line(int argc, char** argv, string& instanceName, string& s
             ("instance_name", po::value<string>(&instanceName)->required(), "instance name available in data path")
             ("selected_algorithm", po::value<string>(&selectedAlgorithm), "specify to select algorithm")
             ("num_iter", po::value<int>(&maxNumIter)->default_value(10), "number of iterations")
+            ("max_time", po::value<double>(&maxTime), "max of execution time required to infinite algorithms")
         ;
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -102,8 +103,9 @@ int main(int argc, char *argv[])
     srand (time(NULL));
     string instanceName, selectedAlgoritm;
     int maxNumIter;
+    double maxTime = 0;
 
-    if (!process_command_line(argc, argv, instanceName, selectedAlgoritm, maxNumIter))
+    if (!process_command_line(argc, argv, instanceName, selectedAlgoritm, maxNumIter, maxTime))
         return -1;
 
     vector<string> algorithmNames{
@@ -116,15 +118,6 @@ int main(int argc, char *argv[])
         "heuristic"
         };
 
-    if (selectedAlgoritm.length())
-    {
-        if (find(algorithmNames.begin(), algorithmNames.end(), selectedAlgoritm) == algorithmNames.end())
-        {
-            cout << "Selected algorithm not in the list of available algorithms";
-            return -1;
-        }
-    }
-
     int execId = genExecId();
 
     QAP qap;
@@ -132,7 +125,9 @@ int main(int argc, char *argv[])
         exit(1);
     Solution solution = Solution(&qap, maxNumIter);
 
-    function<void()> finiteAlgorithms[] = {
+    int finiteAlgorithmsSize = 4;
+
+    function<void()> finiteAlgorithms[finiteAlgorithmsSize] = {
         bind(&Solution::greedyLocalSearch, ref(solution)),
         bind(&Solution::steepestLocalSearch, ref(solution)),
         bind(&Solution::tabuSearch, ref(solution)),
@@ -141,11 +136,38 @@ int main(int argc, char *argv[])
 
     if (selectedAlgoritm.length())
     {
-        cout << "TODO\n";
+        vector<string>::iterator it;
+        if ((it = std::find(algorithmNames.begin(), algorithmNames.end(), selectedAlgoritm)) != algorithmNames.end())
+        {
+            int alg_idx = it - algorithmNames.begin();
+            long numIter;
+            if (alg_idx < finiteAlgorithmsSize){
+                numIter = runAlg(solution, &finiteAlgorithms[alg_idx], maxNumIter);
+            }
+            else
+            {
+                if (maxTime <= 0){
+                    cout << "Selected infinite algorithm requires maxTime to be specified";
+                    exit(-1);
+                }
+                function<void()> infiniteAlgorithms[] = {
+                    bind(&Solution::lessNaiveRandomSearch, ref(solution), maxTime),
+                    bind(&Solution::naiveRandomSearch, ref(solution), maxTime),
+                    bind(&Solution::heuristic, ref(solution), maxTime),
+                };
+                numIter = runAlg(solution, &infiniteAlgorithms[alg_idx], maxNumIter);   
+            }
+            solution.save(resultFilename(instanceName, algorithmNames[alg_idx], execId, maxNumIter), numIter);
+            
+        }
+        else{
+            cout << "Selected algorithm not in the list of available algorithms";
+            exit(-1);
+        }
     }
     else
     {
-        double maxTime = 0;
+        maxTime = 0;
         size_t i = 0;
         for (function<void()> alg: finiteAlgorithms)
         {
